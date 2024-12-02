@@ -647,11 +647,7 @@ mod test {
             std::env::var("ENGINE_IO_SECURE_HOST").unwrap_or_else(|_| "localhost".to_owned());
         headers.insert(HOST, host);
 
-        let _ = builder(url.clone())
-            .tls_config(
-                tls_connector()?
-            )
-            .build()?;
+        let _ = builder(url.clone()).tls_config(tls_connector()?).build()?;
         let _ = builder(url).headers(headers).build()?;
         Ok(())
     }

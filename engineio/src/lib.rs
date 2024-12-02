@@ -146,9 +146,13 @@ pub(crate) mod test {
         {
             let mut root_store = rustls::RootCertStore::empty();
             for cert in rustls_pemfile::certs(&mut buf.as_slice()) {
-                root_store.add(cert.expect("Invalid PEM cert")).expect("Failed to add cert to store");
+                root_store
+                    .add(cert.expect("Invalid PEM cert"))
+                    .expect("Failed to add cert to store");
             }
-            let mut config = rustls::ClientConfig::builder().with_root_certificates(root_store).with_no_client_auth();
+            let mut config = rustls::ClientConfig::builder()
+                .with_root_certificates(root_store)
+                .with_no_client_auth();
             config.enable_sni = false;
             Ok(config)
         }
