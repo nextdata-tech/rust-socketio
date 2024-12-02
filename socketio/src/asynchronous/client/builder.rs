@@ -27,7 +27,7 @@ pub struct ClientBuilder {
     pub(crate) on_any: Option<Callback<DynAsyncAnyCallback>>,
     pub(crate) on_reconnect: Option<Callback<DynAsyncReconnectSettingsCallback>>,
     pub(crate) namespace: String,
-    tls_config: Option<TlsConnector>,
+    tls_config: Option<TlsConfig>,
     pub(crate) opening_headers: Option<HeaderMap>,
     transport_type: TransportType,
     pub(crate) auth: Option<serde_json::Value>,
