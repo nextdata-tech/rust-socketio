@@ -33,7 +33,7 @@ rustls = { version = "^0.22", optional = true }
 # rustls-pemfile is only needed for unit tests
 rustls-pemfile = { version = "2", optional = true }
 # webpki is only needed for unit tests
-webpki = { version = "0.21", optional = true }
+webpki = { version = "0.22", optional = true }
 url = "2.5.4"
 
 [dev-dependencies]
