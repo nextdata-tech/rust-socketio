@@ -29,12 +29,15 @@ async-stream = { version = "0.3.6", optional = true }
 log = "0.4.22"
 serde = "1.0.209"
 native-tls = { version = "0.2", optional = true }
-rustls = { version = "0.22", optional = true }
+rustls = { version = "0.23", default-features = false, optional = true }
 getrandom = "0.2.10"
 
 [dev-dependencies]
 cargo-tarpaulin = "0.18.5"
 serial_test = "3.0.0"
+rustls-pemfile = "2"
+webpki = "0.22"
+rust_engineio = { version = "0.6.0", path = "../engineio", default-features = false, features = ["_test"] }
 
 [dev-dependencies.tokio]
 version = "1.40.0"

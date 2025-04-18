@@ -116,26 +116,18 @@ compile_error!("Both native-tls and rustls features are enabled. Please enable o
 #[cfg(not(any(feature = "_native-tls", feature = "_rustls-tls")))]
 compile_error!("No TLS feature is enabled. Please enable either native-tls or rustls.");
 
-#[cfg(test)]
-pub(crate) mod test {
+#[cfg(any(feature = "_test", test))]
+pub mod test {
     use super::*;
-    #[cfg(feature = "_native-tls")]
-    use native_tls::TlsConnector;
     const CERT_PATH: &str = "../ci/cert/ca.crt";
-    #[cfg(all(feature = "_native-tls", not(feature = "_rustls-tls")))]
-    use native_tls::Certificate;
-    use std::fs::File;
-    use std::io::Read;
 
-    pub(crate) fn tls_connector() -> error::Result<TlsConfig> {
+    pub fn tls_connector() -> error::Result<TlsConfig> {
         let cert_path = std::env::var("CA_CERT_PATH").unwrap_or_else(|_| CERT_PATH.to_owned());
-        let mut cert_file = File::open(cert_path)?;
-        let mut buf = vec![];
-        cert_file.read_to_end(&mut buf)?;
+        let buf = std::fs::read(cert_path)?;
         #[cfg(all(feature = "_native-tls", not(feature = "_rustls-tls")))]
         {
-            let cert: Certificate = Certificate::from_pem(&buf[..]).unwrap();
-            Ok(TlsConnector::builder()
+            let cert = native_tls::Certificate::from_pem(&buf[..]).unwrap();
+            Ok(native_tls::TlsConnector::builder()
                 // ONLY USE FOR TESTING!
                 .danger_accept_invalid_hostnames(true)
                 .add_root_certificate(cert)

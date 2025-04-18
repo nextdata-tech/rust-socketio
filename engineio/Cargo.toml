@@ -21,24 +21,22 @@ adler32 = "1.2.0"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 http = "1.1.0"
-tokio-tungstenite = { version = "0.21.0", features = [] }
-tungstenite = "0.21.0"
+tokio-tungstenite = { version = "0.26.0", features = ["url"] }
+tungstenite = "0.26.0"
 tokio = "1.40.0"
 futures-util = { version = "0.3", default-features = false, features = ["sink"] }
 async-trait = "0.1.83"
 async-stream = "0.3.6"
 thiserror = "1.0"
 native-tls = { version = "^0.2", optional = true }
-rustls = { version = "^0.22", optional = true }
-# rustls-pemfile is only needed for unit tests
+rustls = { version = "^0.23", default-features = false, optional = true }
 rustls-pemfile = { version = "2", optional = true }
-# webpki is only needed for unit tests
-webpki = { version = "0.22", optional = true }
 url = "2.5.4"
 
 [dev-dependencies]
 criterion = { version = "0.5.1", features = ["async_tokio"] }
 lazy_static = "1.4.0"
+webpki = "0.22"
 
 [dev-dependencies.tokio]
 version = "1.40.0"
@@ -65,11 +63,13 @@ rustls-tls-native-roots = ["tokio-tungstenite/rustls-tls-native-roots", "_rustls
 rustls-tls-webpki-roots = ["tokio-tungstenite/rustls-tls-webpki-roots", "_rustls-tls"]
 # These features are for internal use only
 _native-tls = ["dep:native-tls", "reqwest/native-tls"]
-_rustls-tls = ["dep:rustls", "reqwest/rustls-tls", "dep:rustls-pemfile", "dep:webpki"]
+_rustls-tls = ["dep:rustls", "reqwest/rustls-tls"]
 
 # This is an internal feature to allow us to build using cargo-all-features and guaranteing that we always have one TLS implementation
 # Do not use this feature directly
 _fallback-tls = ["native-tls"]
+# this is an internal feature to expose test configs to the socketio crate
+_test = ["dep:rustls-pemfile"]
 
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(tarpaulin)'] }

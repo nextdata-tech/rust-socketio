@@ -383,12 +383,12 @@ mod test {
         headers.insert(HOST, host);
 
         let _ = builder(url.clone())
-            .tls_config(
-                TlsConfig::builder()
-                    .danger_accept_invalid_certs(true)
-                    .build()
-                    .unwrap(),
-            )
+            // .tls_config(
+            //     TlsConfig::builder()
+            //         .danger_accept_invalid_certs(true)
+            //         .build()
+            //         .unwrap(),
+            // )
             .build()
             .await?;
         let _ = builder(url).headers(headers).build().await?;

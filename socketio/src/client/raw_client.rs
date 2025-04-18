@@ -425,7 +425,7 @@ mod test {
     use serde_json::json;
     use std::time::Duration;
 
-    #[cfg(feature = "_native-tls")]
+    #[cfg(all(feature = "_native-tls", not(feature = "_rustls-tls")))]
     fn tls_config() -> native_tls::TlsConnector {
         native_tls::TlsConnector::builder()
             .use_sni(true)

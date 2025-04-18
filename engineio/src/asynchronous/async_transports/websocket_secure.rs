@@ -16,7 +16,6 @@ use tungstenite::client::IntoClientRequest;
 use url::Url;
 
 use super::websocket_general::AsyncWebsocketGeneralTransport;
-use crate::TlsConfig;
 
 /// An asynchronous websocket transport type.
 /// This type only allows for secure websocket
@@ -32,7 +31,7 @@ impl WebsocketSecureTransport {
     /// Tls connector and an URL.
     pub(crate) async fn new(
         base_url: Url,
-        tls_config: Option<TlsConfig>,
+        tls_config: Option<crate::TlsConfig>,
         headers: Option<HeaderMap>,
     ) -> Result<Self> {
         let mut url = base_url;
