@@ -264,27 +264,47 @@ impl ClientBuilder {
 
     /// Uses a preconfigured TLS connector for secure communication. This configures
     /// both the `polling` as well as the `websocket` transport type.
-    /// # Example
-    /// ```rust
-    /// use rust_socketio::{asynchronous::ClientBuilder, Payload};
-    /// use native_tls::TlsConnector;
-    /// use futures_util::future::FutureExt;
-    ///
-    /// #[tokio::main]
-    /// async fn main() {
-    ///     let tls_connector =  TlsConnector::builder()
-    ///                .use_sni(true)
-    ///                .build()
-    ///             .expect("Found illegal configuration");
-    ///
-    ///     let socket = ClientBuilder::new("http://localhost:4200/")
-    ///         .namespace("/admin")
-    ///         .on("error", |err, _| async move { eprintln!("Error: {:#?}", err) }.boxed())
-    ///         .tls_config(tls_connector)
-    ///         .connect()
-    ///         .await;
-    /// }
-    /// ```
+    #[cfg_attr(
+        feature = "_native-tls",
+        doc = r#"
+# Example for native-tls
+
+```rust
+use rust_socketio::{ClientBuilder, Payload};
+
+let tls_connector = native_tls::TlsConnector::builder()
+            .use_sni(true)
+            .build()
+            .expect("Found illegal configuration");
+
+# #[cfg(not(feature = "_rustls-tls"))] {
+let socket = ClientBuilder::new("http://localhost:4200/")
+    .namespace("/admin")
+    .on("error", |err, _| eprintln!("Error: {:#?}", err))
+    .tls_config(tls_connector)
+    .connect();
+# }
+```"#
+    )]
+    #[cfg_attr(
+        feature = "_rustls-tls",
+        doc = r#"
+# Example for rustls
+
+```rust
+use rust_socketio::{ClientBuilder, Payload};
+
+let tls_config = rustls::ClientConfig::builder()
+    .with_root_certificates(rustls::RootCertStore::empty())
+    .with_no_client_auth();
+
+let socket = ClientBuilder::new("http://localhost:4200/")
+    .namespace("/admin")
+    .on("error", |err, _| eprintln!("Error: {:#?}", err))
+    .tls_config(tls_config)
+    .connect();
+```"#
+    )]
     pub fn tls_config(mut self, tls_config: TlsConfig) -> Self {
         self.tls_config = Some(tls_config);
         self
