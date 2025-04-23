@@ -270,20 +270,26 @@ impl ClientBuilder {
 # Example for native-tls
 
 ```rust
-use rust_socketio::{ClientBuilder, Payload};
+use rust_socketio::{asynchronous::ClientBuilder, Payload};
+use futures_util::future::FutureExt;
 
-let tls_connector = native_tls::TlsConnector::builder()
-            .use_sni(true)
-            .build()
-            .expect("Found illegal configuration");
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let tls_connector = native_tls::TlsConnector::builder()
+                .use_sni(true)
+                .build()
+                .expect("Found illegal configuration");
 
 # #[cfg(not(feature = "_rustls-tls"))] {
-let socket = ClientBuilder::new("http://localhost:4200/")
-    .namespace("/admin")
-    .on("error", |err, _| eprintln!("Error: {:#?}", err))
-    .tls_config(tls_connector)
-    .connect();
+    let socket = ClientBuilder::new("http://localhost:4200/")
+        .namespace("/admin")
+        .on("error", |err, _| async move { eprintln!("Error: {:#?}", err) }.boxed())
+        .tls_config(tls_connector)
+        .connect()
+        .await?;
 # }
+    Ok(())
+}
 ```"#
     )]
     #[cfg_attr(
@@ -292,17 +298,23 @@ let socket = ClientBuilder::new("http://localhost:4200/")
 # Example for rustls
 
 ```rust
-use rust_socketio::{ClientBuilder, Payload};
+use rust_socketio::{asynchronous::ClientBuilder, Payload};
+use futures_util::future::FutureExt;
 
-let tls_config = rustls::ClientConfig::builder()
-    .with_root_certificates(rustls::RootCertStore::empty())
-    .with_no_client_auth();
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let tls_config = rustls::ClientConfig::builder()
+        .with_root_certificates(rustls::RootCertStore::empty())
+        .with_no_client_auth();
 
-let socket = ClientBuilder::new("http://localhost:4200/")
-    .namespace("/admin")
-    .on("error", |err, _| eprintln!("Error: {:#?}", err))
-    .tls_config(tls_config)
-    .connect();
+    let socket = ClientBuilder::new("http://localhost:4200/")
+        .namespace("/admin")
+        .on("error", |err, _| async move { eprintln!("Error: {:#?}", err) }.boxed())
+        .tls_config(tls_config)
+        .connect()
+        .await?;
+    Ok(())
+}
 ```"#
     )]
     pub fn tls_config(mut self, tls_config: TlsConfig) -> Self {

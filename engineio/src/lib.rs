@@ -120,7 +120,7 @@ compile_error!("No TLS feature is enabled. Please enable either native-tls or ru
 pub mod test {
     use super::*;
     #[cfg(test)]
-    use test_inner::*;
+    pub(crate) use test_inner::*;
     const CERT_PATH: &str = "../ci/cert/ca.crt";
 
     pub fn tls_connector() -> error::Result<TlsConfig> {

@@ -92,7 +92,6 @@ impl Debug for Client {
 mod test {
 
     use super::*;
-    use crate::TlsConfig;
     use crate::{asynchronous::ClientBuilder, header::HeaderMap, packet::PacketId, Error};
     use bytes::Bytes;
     use futures_util::StreamExt;
@@ -382,15 +381,7 @@ mod test {
             std::env::var("ENGINE_IO_SECURE_HOST").unwrap_or_else(|_| "localhost".to_owned());
         headers.insert(HOST, host);
 
-        let _ = builder(url.clone())
-            // .tls_config(
-            //     TlsConfig::builder()
-            //         .danger_accept_invalid_certs(true)
-            //         .build()
-            //         .unwrap(),
-            // )
-            .build()
-            .await?;
+        let _ = builder(url.clone()).build().await?;
         let _ = builder(url).headers(headers).build().await?;
         Ok(())
     }
