@@ -434,36 +434,32 @@ impl Client {
     /// Handles the incoming acks and classifies what callbacks to call and how.
     #[inline]
     async fn handle_ack(&self, socket_packet: &Packet) -> Result<()> {
-        let mut to_be_removed = Vec::new();
         if let Some(id) = socket_packet.id {
-            for (index, ack) in self.outstanding_acks.write().await.iter_mut().enumerate() {
-                if ack.id == id {
-                    to_be_removed.push(index);
+            let packet_acks: Vec<_> = self
+                .outstanding_acks
+                .write()
+                .await
+                .extract_if(.., |ack| ack.id == id)
+                .collect();
 
-                    if ack.time_started.elapsed() < ack.timeout {
-                        if let Some(ref payload) = socket_packet.data {
+            for mut ack in packet_acks {
+                if ack.time_started.elapsed() < ack.timeout {
+                    if let Some(ref payload) = socket_packet.data {
+                        ack.callback.deref_mut()(Payload::from(payload.to_owned()), self.clone())
+                            .await;
+                    }
+                    if let Some(ref attachments) = socket_packet.attachments {
+                        if let Some(payload) = attachments.get(0) {
                             ack.callback.deref_mut()(
-                                Payload::from(payload.to_owned()),
+                                Payload::Binary(payload.to_owned()),
                                 self.clone(),
                             )
                             .await;
                         }
-                        if let Some(ref attachments) = socket_packet.attachments {
-                            if let Some(payload) = attachments.get(0) {
-                                ack.callback.deref_mut()(
-                                    Payload::Binary(payload.to_owned()),
-                                    self.clone(),
-                                )
-                                .await;
-                            }
-                        }
-                    } else {
-                        trace!("Received an Ack that is now timed out (elapsed time was longer than specified duration)");
                     }
+                } else {
+                    trace!("Received an Ack that is now timed out (elapsed time was longer than specified duration)");
                 }
-            }
-            for index in to_be_removed {
-                self.outstanding_acks.write().await.remove(index);
             }
         }
         Ok(())
