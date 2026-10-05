@@ -70,5 +70,5 @@ fi
 if [ ! -f "server.crt" ]
 then
     echo "Generating signed server certifcicate"
-    openssl x509 -req -in server.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out server.crt -extfile csr.conf
+    openssl x509 -req -in server.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out server.crt -extfile csr.conf -extensions req_ext
 fi

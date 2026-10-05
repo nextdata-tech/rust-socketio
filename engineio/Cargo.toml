@@ -21,15 +21,15 @@ adler32 = "1.2.0"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 http = "1.1.0"
-tokio-tungstenite = { version = "0.21.0", features = [] }
-tungstenite = "0.21.0"
+tokio-tungstenite = { version = "0.24.0", features = ["url"] }
+tungstenite = "0.24.0"
 tokio = "1.40.0"
 futures-util = { version = "0.3", default-features = false, features = ["sink"] }
 async-trait = "0.1.83"
 async-stream = "0.3.6"
 thiserror = "1.0"
 native-tls = { version = "^0.2", optional = true }
-rustls = { version = "^0.22", optional = true }
+rustls = { version = "0.23.45", optional = true, default-features = false, features = ["ring", "std", "tls12"] }
 # rustls-pemfile is only needed for unit tests
 rustls-pemfile = { version = "2", optional = true }
 # webpki is only needed for unit tests
@@ -48,6 +48,7 @@ features = ["macros"]
 [[bench]]
 name = "engineio"
 harness = false
+required-features = ["_native-tls"]
 
 # needs to be present in order to support the benchmark
 # ci job

@@ -606,7 +606,6 @@ mod test {
 
     use bytes::Bytes;
     use futures_util::{FutureExt, StreamExt};
-    use native_tls::TlsConnector;
     use serde_json::json;
     use serial_test::serial;
     use tokio::{
@@ -623,6 +622,21 @@ mod test {
         packet::{Packet, PacketId},
         CloseReason, Event, Payload, TransportType,
     };
+
+    #[cfg(feature = "_native-tls")]
+    fn tls_config() -> crate::TlsConfig {
+        native_tls::TlsConnector::builder()
+            .use_sni(true)
+            .build()
+            .expect("Found illegal configuration")
+    }
+
+    #[cfg(feature = "_rustls-tls")]
+    fn tls_config() -> crate::TlsConfig {
+        rustls::ClientConfig::builder()
+            .with_root_certificates(rustls::RootCertStore::empty())
+            .with_no_client_auth()
+    }
 
     #[tokio::test]
     async fn socket_io_integration() -> Result<()> {
@@ -721,10 +735,7 @@ mod test {
         // test socket build logic
         let socket_builder = ClientBuilder::new(url);
 
-        let tls_connector = TlsConnector::builder()
-            .use_sni(true)
-            .build()
-            .expect("Found illegal configuration");
+        let tls_connector = tls_config();
 
         let socket = socket_builder
             .namespace("/admin")
@@ -880,10 +891,7 @@ mod test {
         // test socket build logic
         let socket_builder = ClientBuilder::new(url);
 
-        let tls_connector = TlsConnector::builder()
-            .use_sni(true)
-            .build()
-            .expect("Found illegal configuration");
+        let tls_connector = tls_config();
 
         let socket = socket_builder
             .namespace("/admin")

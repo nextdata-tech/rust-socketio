@@ -29,7 +29,7 @@ async-stream = { version = "0.3.6", optional = true }
 log = "0.4.22"
 serde = "1.0.209"
 native-tls = { version = "0.2", optional = true }
-rustls = { version = "0.22", optional = true }
+rustls = { version = "0.23.45", optional = true, default-features = false, features = ["ring", "std", "tls12"] }
 getrandom = "0.2.10"
 
 [dev-dependencies]

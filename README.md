@@ -9,6 +9,18 @@
 An implementation of a socket.io client written in the rust programming language. This implementation currently supports revision 5 of the socket.io protocol and therefore revision 4 of the engine.io protocol. If you have any connection issues with this client, make sure the server uses at least revision 4 of the engine.io protocol.
 Information on the [`async`](#async) version can be found below.
 
+## TLS backends
+
+Native TLS is enabled by default. To use Rustls, disable default features and
+enable `rustls-tls-native-roots` or `rustls-tls-webpki-roots`.
+These features use Rustls 0.23 with the ring provider; custom `TlsConfig` values
+must use that Rustls version. Applications enabling multiple Rustls crypto
+providers must install their chosen provider before connecting.
+
+The Rustls minimum is 0.23.45, which requires a patched `rustls-webpki` release.
+Git consumers must update their lockfile to the fork revision containing this
+change; updating this repository's lockfile alone does not update consumers.
+
 ## Example usage
 
 Add the following to your `Cargo.toml` file:
