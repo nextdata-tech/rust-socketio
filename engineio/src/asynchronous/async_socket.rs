@@ -78,8 +78,13 @@ impl Socket {
         }
     }
 
-    /// Opens the connection to a specified server. The first Pong packet is sent
-    /// to the server to trigger the Ping-cycle.
+    /// Opens the connection to a specified server.
+    ///
+    /// No packet is sent: in Engine.IO v4 the server starts the ping cycle and
+    /// the client only answers its pings. An unprompted Pong here reached the
+    /// server alongside the answer to its first ping, and a server that queues
+    /// one Pong at a time (engineioxide) closed the session as a heartbeat
+    /// timeout.
     pub async fn connect(&self) -> Result<()> {
         // SAFETY: Has valid handshake due to type
         self.connected.store(true, Ordering::Release);
@@ -92,9 +97,6 @@ impl Socket {
 
         // set the last ping to now and set the connected state
         *self.last_ping.lock().await = Instant::now();
-
-        // emit a pong packet to keep trigger the ping cycle on the server
-        self.emit(Packet::new(PacketId::Pong, Bytes::new())).await?;
 
         Ok(())
     }
